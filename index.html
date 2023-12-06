@@ -5,95 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reservation System</title>
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f8f8f8;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .container {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    h1 {
-      color: #2c3e50;
-    }
-
-    form {
-      margin-top: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    select, input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      background-color: #3498db;
-      color: #fff;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    #message {
-      margin-top: 20px;
-      color: #27ae60;
-      font-weight: bold;
-    }
+    /* ... Your existing CSS styles ... */
   </style>
 </head>
 <body> 
   <div class="container">
     <h1>Reservation System</h1>
     <form id="reservationForm">
-      <label for="name">Your Name:</label>
-      <input type="text" id="name" placeholder="Enter your name" required>
-
-      <label for="email">Your Email:</label>
-      <input type="email" id="email" placeholder="Enter your email" required>
-
-      <label for="day">Select a Day:</label>
-      <select id="day" required>
-        <option value="" disabled selected>Select a day</option>
-        <option value="Monday">Monday</option>
-        <option value="Tuesday">Tuesday</option>
-        <option value="Wednesday">Wednesday</option>
-        <option value="Thursday">Thursday</option>
-        <option value="Friday">Friday</option>
-      </select>
-
-      <label for="time">Select a Time:</label>
-      <select id="time" required>
-        <option value="" disabled selected>Select a time</option>
-        <option value="10:00 AM">10:00 AM</option>
-        <option value="1:30 PM">1:30 PM</option>
-      </select>
-
-      <label for="date">Select a Date:</label>
-      <input type="date" id="date" required>
+      <!-- ... Your existing form elements ... -->
 
       <button type="submit">Reserve</button>
     </form>
@@ -104,8 +23,8 @@
       const reservationForm = document.getElementById("reservationForm");
       const message = document.getElementById("message");
 
-      // Store reservations to track availability
-      const reservations = {};
+      // Load reservations from local storage
+      const reservations = JSON.parse(localStorage.getItem("reservations")) || {};
 
       reservationForm.addEventListener("submit", function(event) {
         event.preventDefault();
@@ -118,24 +37,42 @@
 
         const slotKey = `${day}_${time}`;
 
-        // Check if the slot is available
         if (!reservations[slotKey]) {
           reservations[slotKey] = 1;
-          
+
           // Show a reservation message
-          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}.`;
+          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}. Confirmation email sent to ${email}.`;
+
+          // Send confirmation email
+          sendConfirmationEmail(name, email, day, time, date);
+
+          // Save updated reservations to local storage
+          localStorage.setItem("reservations", JSON.stringify(reservations));
         } else if (reservations[slotKey] < 4) {
           reservations[slotKey]++;
-          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}.`;
+          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}. Confirmation email sent to ${email}.`;
+
+          // Send confirmation email
+          sendConfirmationEmail(name, email, day, time, date);
+
+          // Save updated reservations to local storage
+          localStorage.setItem("reservations", JSON.stringify(reservations));
         } else {
           message.textContent = `Sorry, ${day} at ${time} is fully booked. Please choose another time.`;
         }
 
-        // Clear the form
         reservationForm.reset();
       });
+
+      function sendConfirmationEmail(name, email, day, time, date) {
+        // Simulate server-side email notification (replace with actual server-side logic)
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "sendConfirmationEmail.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        const data = `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&day=${encodeURIComponent(day)}&time=${encodeURIComponent(time)}&date=${encodeURIComponent(date)}`;
+        xhr.send(data);
+      }
     });
   </script>
 </body>  
 </html>
-
