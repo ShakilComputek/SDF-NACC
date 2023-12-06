@@ -72,6 +72,9 @@
       <label for="name">Your Name:</label>
       <input type="text" id="name" placeholder="Enter your name" required>
 
+      <label for="email">Your Email:</label>
+      <input type="email" id="email" placeholder="Enter your email" required>
+
       <label for="day">Select a Day:</label>
       <select id="day" required>
         <option value="" disabled selected>Select a day</option>
@@ -101,16 +104,33 @@
       const reservationForm = document.getElementById("reservationForm");
       const message = document.getElementById("message");
 
+      // Store reservations to track availability
+      const reservations = {};
+
       reservationForm.addEventListener("submit", function(event) {
         event.preventDefault();
 
         const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
         const day = document.getElementById("day").value;
         const time = document.getElementById("time").value;
         const date = document.getElementById("date").value;
 
-        // Show a reservation message
-        message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}.`;
+        const slotKey = `${day}_${time}`;
+
+        // Check if the slot is available
+        if (!reservations[slotKey]) {
+          reservations[slotKey] = 1;
+          
+          // Show a reservation message
+          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}.`;
+        } else if (reservations[slotKey] < 4) {
+          reservations[slotKey]++;
+          message.textContent = `Hi ${name}! You've successfully reserved a spot for ${day} at ${time} on ${date}.`;
+        } else {
+          message.textContent = `Sorry, ${day} at ${time} is fully booked. Please choose another time.`;
+        }
+
         // Clear the form
         reservationForm.reset();
       });
@@ -118,3 +138,4 @@
   </script>
 </body>  
 </html>
+
